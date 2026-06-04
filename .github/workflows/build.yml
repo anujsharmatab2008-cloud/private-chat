@@ -33,7 +33,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install cython==0.29.36 virtualenv buildozer
 
-    # Cache Buildozer and Gradle state to speed up subsequent workflow runs
+    # Cache Buildozer and Gradle state to dramatically reduce subsequent compile times
     - name: Cache Buildozer global directory
       uses: actions/cache@v4
       with:
@@ -44,17 +44,13 @@ jobs:
 
     - name: Compile APK via Buildozer
       run: |
-        # Force buildozer to use the runner's pre-installed SDK/NDK and stable Gradle home
         buildozer -v android debug
       env:
-        APP_ANDROID_ACCEPT_SDK_LICENSE: "y"
-        ANDROID_HOME: /usr/local/lib/android/sdk
-        ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk-bundle
+        APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
         GRADLE_USER_HOME: /home/runner/.gradle
 
     - name: Upload Finished APK
       uses: actions/upload-artifact@v4
       with:
         name: Compiled-Chat-APK
-        # Buildozer outputs to bin/, using **/*.apk handles potential pathing quirks safely
         path: bin/*.apk
